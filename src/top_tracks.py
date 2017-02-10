@@ -20,7 +20,7 @@ class Track:
 
         self.client = client
 
-    def get_oembed(self):
+    def get_oembed(self, index=0):
         embed = self.client.get('/oembed',
                                 url=self.url,
                                 maxheight=175,
@@ -29,9 +29,10 @@ class Track:
                                 show_playcount='true',
                                 show_comments='false')
         # This is super hacky
-        player = embed.html.replace('visual=true', 'visual=false')
+        player = embed.html
+        player = player.replace('<iframe', '<iframe id="audio-{}"'.format(index))
+        player = player.replace('visual=true', 'visual=false')
         player = re.sub('&client_id=[^&]*', '', player)
-        player += '<br>'
 
         return player
 

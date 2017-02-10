@@ -1,13 +1,12 @@
-var sounds = document.getElementsByTagName('audio');
+var sounds = document.getElementsByTagName('iframe');
 
-for (let sound of sounds) {
+for (let i = 0; i < sounds.length-1; i++) {
+    let sound = sounds[i];
+    let curr = SC.Widget(sound.id);
     let next_num = +sound.id.match(/\d+/)[0]+1;
-    let next = document.getElementById('audio-' + next_num);
+    let next = SC.Widget('audio-' + next_num);
 
-    if (next) {
-        sound.addEventListener('ended', () => {
-            sound.currentTime = 0;
-            next.play();
-        });
-    }
+    curr.bind(SC.Widget.Events.FINISH, () => {
+        next.play();
+    });
 }

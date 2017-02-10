@@ -4,15 +4,11 @@
     </head>
     <body>
         % for i, song in enumerate(songs):
-            <% j = i+1 %>
-            <b>${j}. <a href="${song.url}">${song.title}</a></b>
-            <br>
-            Plays: ${'{:,}'.format(song.plays)}
-            <br>
-            <audio id="audio-${j}" controls src="${song.get_stream_url()}"></audio>
+            ${song.get_oembed(i)}
             <br>
         % endfor
 
+        <script src="https://w.soundcloud.com/player/api.js"></script>
         <script src="playlist.js"></script>
     </body>
 </html>
