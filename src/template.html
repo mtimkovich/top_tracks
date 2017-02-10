@@ -1,0 +1,16 @@
+<html>
+    <head>
+        <title>${artist}</title>
+    </head>
+    <body>
+        % for i, song in enumerate(songs):
+            <% j = i+1 %>
+            <b>${j}. <a href="${song.url}">${song.title}</a></b>
+            <br>
+            Plays: ${'{:,}'.format(song.plays)}
+            <br>
+            <audio id="audio-${j}" controls src="${song.get_stream_url()}"></audio>
+            <br>
+        % endfor
+    </body>
+</html>
