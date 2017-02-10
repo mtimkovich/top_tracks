@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import argparse
-import json
 from mako.template import Template
 import re
 import soundcloud
@@ -12,6 +11,8 @@ class Track:
         self.plays = getattr(track, 'playback_count', 0)
         self.downloads = getattr(track, 'download_count', 0)
         self.title = track.title
+        self.id = track.id
+
         self.url = track.permalink_url
         self.stream = track.stream_url
 
@@ -20,7 +21,7 @@ class Track:
 
         self.client = client
 
-    def get_oembed(self, index=0):
+    def get_oembed(self, index=None):
         embed = self.client.get('/oembed',
                                 url=self.url,
                                 maxheight=175,
@@ -30,7 +31,8 @@ class Track:
                                 show_comments='false')
         # This is super hacky
         player = embed.html
-        player = player.replace('<iframe', '<iframe id="audio-{}"'.format(index))
+        if index is not None:
+            player = player.replace('<iframe', '<iframe id="audio-{}"'.format(index))
         player = player.replace('visual=true', 'visual=false')
         player = re.sub('&client_id=[^&]*', '', player)
 
