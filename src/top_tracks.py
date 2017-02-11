@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
-import argparse
 import cgi
 from mako.template import Template
-import re
 import requests
 import soundcloud
 import sys
@@ -29,8 +27,11 @@ class Track:
 
 form = cgi.FieldStorage()
 artist = form.getvalue('artist', '')
+template = Template(filename='template.html')
+title = 'Top Tracks'
 
 if not artist:
+    print(template.render())
     sys.exit()
 
 with open('/home/protected/soundcloud.yml') as f:
@@ -42,8 +43,9 @@ songs = []
 try:
     user_id = client.get('/resolve', url='http://soundcloud.com/' + artist).id
 except requests.exceptions.HTTPError:
-    print('User {} not found'.format(artist))
-    sys.exit(1)
+    error = 'User {} not found'.format(artist)
+    print(template.render(error=error))
+    sys.exit()
 
 next_href = '/users/{}/tracks'.format(user_id)
 while True:
@@ -58,6 +60,5 @@ while True:
 
 songs = sorted(songs, reverse=True)
 
-template = Template(filename='template.html')
 print(template.render(artist=artist,
                       songs=songs[:20]))
