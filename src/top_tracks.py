@@ -1,42 +1,23 @@
 #!/usr/bin/env python3
 import argparse
+import cgi
 from mako.template import Template
 import re
 import soundcloud
+import sys
 import yaml
+
+print('Content-Type: text/html')
+print()
 
 
 class Track:
     def __init__(self, track, client):
-        self.plays = getattr(track, 'playback_count', 0)
-        self.downloads = getattr(track, 'download_count', 0)
-        self.title = track.title
         self.id = track.id
-
-        self.url = track.permalink_url
-        self.stream = track.stream_url
-
-        self.favorites = getattr(track, 'favoritings_count', 0)
-        self.uri = track.uri
+        self.title = track.title
+        self.plays = getattr(track, 'playback_count', 0)
 
         self.client = client
-
-    def get_oembed(self, index=None):
-        embed = self.client.get('/oembed',
-                                url=self.url,
-                                maxheight=175,
-                                maxwidth=500,
-                                download='false',
-                                show_playcount='true',
-                                show_comments='false')
-        # This is super hacky
-        player = embed.html
-        if index is not None:
-            player = player.replace('<iframe', '<iframe id="audio-{}"'.format(index))
-        player = player.replace('visual=true', 'visual=false')
-        player = re.sub('&client_id=[^&]*', '', player)
-
-        return player
 
     def get_stream_url(self):
         stream_url = self.client.get(self.stream, allow_redirects=False)
@@ -45,17 +26,23 @@ class Track:
     def __lt__(self, other):
         return self.plays < other.plays
 
-parser = argparse.ArgumentParser()
-parser.add_argument('artist', help='SoundCloud artist')
-args = parser.parse_args()
+artist = form.getValue('artist', '')
 
-with open('soundcloud.yml') as f:
+if not artist:
+    sys.exit()
+
+with open('/home/protected/soundcloud.yml') as f:
     config = yaml.load(f)
 
 client = soundcloud.Client(client_id=config['client_id'])
 songs = []
 
-user_id = client.get('/resolve', url='http://soundcloud.com/' + args.artist).id
+try:
+    user_id = client.get('/resolve', url='http://soundcloud.com/' + artist).id
+except requests.exceptions.HTTPError:
+    print('User {} not found'.format(artist)
+    sys.exit(1)
+
 next_href = '/users/{}/tracks'.format(user_id)
 while True:
     tracks = client.get(next_href, limit=200, linked_partitioning=1)
