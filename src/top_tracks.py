@@ -43,8 +43,9 @@ songs = []
 try:
     user_id = client.get('/resolve', url='http://soundcloud.com/' + artist).id
 except requests.exceptions.HTTPError:
-    error = 'User {} not found'.format(artist)
-    print(template.render(error=error))
+    error = 'User "{}" not found'.format(artist)
+    print(template.render(artist=artist,
+                          error=error))
     sys.exit()
 
 next_href = '/users/{}/tracks'.format(user_id)

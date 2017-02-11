@@ -1,7 +1,7 @@
 <html>
     <head>
         <title>
-            % if ${artist}:
+            % if artist or artist is not UNDEFINED:
             Top Tracks | ${artist}
             % else:
             Top Tracks
@@ -15,18 +15,23 @@
     input[type='text'] {
         width: 200px;
     }
+
+    #error {
+	    color: red;
+    }
     </style>
     </head>
     <body>
         <img height="120" src="top_tracks.png">
 
-        <div id='error'>${error}</div>
+        <div id='error'>${context.get('error', '')}</div>
 
         <form>
-            <input id='artist' name='artist' type='text' value="${artist}" placeholder="SoundCloud Username"></input>
+            <input name='artist' type='text' value="${context.get('artist', '')}" placeholder="SoundCloud Username"></input>
             <input type='submit' value='Go'></input>
         </form>
 
+	% if songs is not UNDEFINED:
         % for i, song in enumerate(songs):
             <iframe id="audio-${i}" width="500" height="175" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?visual=false&url=https%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F${song.id}&show_artwork=true&maxheight=175&show_playcount=true&download=false&show_comments=false&maxwidth=500"></iframe>
             <br>
@@ -34,5 +39,6 @@
 
         <script src="https://w.soundcloud.com/player/api.js"></script>
         <script src="playlist.js"></script>
+	% endif
     </body>
 </html>
