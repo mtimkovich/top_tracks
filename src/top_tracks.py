@@ -3,6 +3,7 @@ import argparse
 import cgi
 from mako.template import Template
 import re
+import requests
 import soundcloud
 import sys
 import yaml
@@ -26,7 +27,8 @@ class Track:
     def __lt__(self, other):
         return self.plays < other.plays
 
-artist = form.getValue('artist', '')
+form = cgi.FieldStorage()
+artist = form.getvalue('artist', '')
 
 if not artist:
     sys.exit()
@@ -40,7 +42,7 @@ songs = []
 try:
     user_id = client.get('/resolve', url='http://soundcloud.com/' + artist).id
 except requests.exceptions.HTTPError:
-    print('User {} not found'.format(artist)
+    print('User {} not found'.format(artist))
     sys.exit(1)
 
 next_href = '/users/{}/tracks'.format(user_id)
@@ -57,5 +59,5 @@ while True:
 songs = sorted(songs, reverse=True)
 
 template = Template(filename='template.html')
-print(template.render(artist=args.artist,
+print(template.render(artist=artist,
                       songs=songs[:20]))
