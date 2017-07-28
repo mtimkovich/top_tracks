@@ -1,8 +1,6 @@
 from flask import Flask, Blueprint, render_template, request, url_for, \
-        redirect, current_app, abort
-
+                  redirect, current_app, abort
 import re
-import requests
 from requests import HTTPError
 import soundcloud
 
